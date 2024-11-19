@@ -1,11 +1,7 @@
 name: Export Package
 
 on:
-  pull_request: {}
-  push: { branches: [main] }
-
-env:
-  UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+  workflow_dispatch:
 
 jobs:
   build:
@@ -14,7 +10,7 @@ jobs:
     steps:
       # Checkout
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           lfs: true
 
@@ -28,14 +24,18 @@ jobs:
 
       # Build
       - name: Build .unitypackage
-        uses: game-ci/unity-builder@v2
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           unityVersion: 2020.3.1f1
           buildMethod: ExportPackageExample.Editor.UnityPackageExporter.Export # Path to the export method containing the namespace.
 
       # Upload
       - name: Upload .unitypackage
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: Unity Package
           path: Build
